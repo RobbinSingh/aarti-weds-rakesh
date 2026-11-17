@@ -245,7 +245,7 @@ if(G) gsap.registerPlugin(ScrollTrigger);
 if(window.Lenis){ lenis=new Lenis({duration:1.35,easing:t=>1-Math.pow(1-t,3)}); lenis.stop(); if(G){lenis.on('scroll',ScrollTrigger.update);gsap.ticker.add(t=>lenis.raf(t*1000));gsap.ticker.lagSmoothing(0);} }
 const soft='power2.out';
 const words=root=>[...root.querySelectorAll('.w2, .w:not(:has(.w2))')];
-function bloom(card,delay=0){ const art=card.querySelector('.art'); const tl=gsap.timeline({delay});
+function bloom(card,delay=0,skipArt=false){ const art=skipArt?null:card.querySelector('.art'); const tl=gsap.timeline({delay});
   if(art){ tl.fromTo(art,{'--b':'-35%',filter:'blur(8px) saturate(.55)',scale:1.06},{'--b':'125%',filter:'blur(0px) saturate(1)',scale:1,duration:2.2,ease:'power2.inOut'}); }
   const lines=[...card.querySelectorAll('.w')]; const t0=art?1.0:.15;
   gsap.set(card.querySelectorAll('.w2'),{opacity:1,y:0,filter:'none'});
@@ -263,16 +263,27 @@ function openGate(){ if(opened) return; opened=true;
   const first=$('.pg .card');
   const done=()=>{$('#gate').remove();document.body.classList.remove('lock');lenis&&lenis.start();ScrollTrigger.refresh();petals();};
   if(!G){ done(); return; }
-  gsap.set(first.querySelector('.art'),{'--b':'-35%'});
-  gsap.timeline({onComplete:done})
+  // the mandap page waits underneath fully painted; the invitation card rises out of the envelope and grows into it
+  gsap.set(first.querySelector('.art'),{'--b':'125%',filter:'none',scale:1});
+  const grow=()=>{
+    const L=$('#letter'), lr=L.getBoundingClientRect(), cr=first.getBoundingClientRect();
+    const ov=document.createElement('div'); ov.id='rise';
+    ov.style.cssText=`position:fixed;z-index:260;left:${lr.left}px;top:${lr.top}px;width:${lr.width}px;height:${lr.height}px;border-radius:4px;background:#F3D5B2 url(assets/img/mandap.webp) 50% 18%/cover;box-shadow:0 14px 34px rgba(70,25,10,.35)`;
+    document.body.appendChild(ov); L.style.visibility='hidden';
+    gsap.timeline({onComplete:()=>{ $('#gate').style.display='none'; ov.remove(); done(); bloom(first,0,true); }})
+     .to(ov,{left:cr.left,top:cr.top,width:cr.width,height:cr.height,borderRadius:0,backgroundPosition:'50% 0%',duration:1.5,ease:'power3.inOut'})
+     .to(ov,{boxShadow:'0 0 0 rgba(0,0,0,0)',duration:.5},'-=.5')
+     .to('#env',{y:140,opacity:0,duration:.9,ease:'power2.in'},0)
+     .to('#gate .gtop',{opacity:0,y:-30,duration:.6},0);
+  };
+  gsap.timeline()
    .to('#gate .tap',{opacity:0,duration:.3})
    .to('#seal',{scale:1.35,opacity:0,duration:.6,ease:'power2.in'},'<')
    .to('#flap',{rotateX:180,duration:1.0,ease:'power2.inOut'},'-=.2')
    .set('#flap',{zIndex:0})
-   .to('#letter',{yPercent:-62,duration:1.1,ease:'power3.out'},'-=.25')
-   .to('#gate .gtop',{opacity:0,y:-20,duration:.6},'<')
-   .add(()=>bloom(first),'-=1.0')
-   .to('#gate',{yPercent:-100,duration:1.4,ease:'power2.inOut'},'+=.25');
+   .to('#letter',{yPercent:-112,duration:1.3,ease:'power2.out'},'-=.25')
+   .to('#gate .gtop',{opacity:0,y:-24,duration:.5,ease:'power1.in'},'<')
+   .call(grow,null,'+=.15');
 }
 $('#env').addEventListener('click',openGate);
 
