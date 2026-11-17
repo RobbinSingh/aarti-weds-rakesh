@@ -247,10 +247,9 @@ const soft='power2.out';
 const words=root=>[...root.querySelectorAll('.w2, .w:not(:has(.w2))')];
 function bloom(card,delay=0){ const art=card.querySelector('.art'); const tl=gsap.timeline({delay});
   if(art){ tl.fromTo(art,{'--b':'-35%',filter:'blur(8px) saturate(.55)',scale:1.06},{'--b':'125%',filter:'blur(0px) saturate(1)',scale:1,duration:2.2,ease:'power2.inOut'}); }
-  card.querySelectorAll('.w').forEach(w=>{ if(!w.querySelector('.w2')) gsap.set(w,{opacity:1,y:0,filter:'blur(0px)'}); else gsap.set(w,{opacity:1,y:0,filter:'none'}); });
-  const ws=card.querySelectorAll('.w2, .w:not(:has(.w2))');
-  gsap.set(card.querySelectorAll('.w2'),{opacity:0,y:14,filter:'blur(6px)'});
-  tl.fromTo([...ws].filter(x=>!x.querySelector||!x.querySelector('.w2')),{opacity:0,y:14,filter:'blur(6px)'},{opacity:1,y:0,filter:'blur(0px)',duration:1.1,stagger:.07,ease:soft}, art?1.0:.15);
+  const lines=[...card.querySelectorAll('.w')]; const t0=art?1.0:.15;
+  gsap.set(card.querySelectorAll('.w2'),{opacity:1,y:0,filter:'none'});
+  lines.forEach((ln,i)=>{ tl.fromTo(ln,{opacity:0,y:16,filter:'blur(6px)'},{opacity:1,y:0,filter:'blur(0px)',duration:1.0,ease:soft}, t0+i*.13); });
   return tl; }
 
 if(G){
@@ -283,7 +282,7 @@ if(G){
   pgs.forEach((pg,i)=>{
     const card=pg.querySelector('.card');
     // hide text until the page arrives
-    gsap.set(card.querySelectorAll('.w2, .w:not(:has(.w2))'),{opacity:0,y:14,filter:'blur(6px)'});
+    gsap.set(card.querySelectorAll('.w'),{opacity:0,y:16,filter:'blur(6px)'});
     if(i>0){ gsap.set(card.querySelector('.art')||{},{'--b':'-35%'});
       ScrollTrigger.create({trigger:pg,start:'top 70%',once:true,onEnter:()=>bloom(card)}); }
     if(i<pgs.length-1){
