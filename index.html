@@ -288,7 +288,7 @@ if(G){
     if(i<pgs.length-1){
       // the page stays put while the next one slides over it, gently receding
       ScrollTrigger.create({trigger:pg,start:'top top',end:()=>'+='+innerHeight,pin:true,pinSpacing:false,invalidateOnRefresh:true});
-      gsap.to(card,{scale:.93,filter:'brightness(.82)',ease:'none',scrollTrigger:{trigger:pg,start:'top top',end:()=>'+='+innerHeight,scrub:true,invalidateOnRefresh:true}});
+      gsap.fromTo(card,{scale:1,filter:'brightness(1)'},{scale:.93,filter:'brightness(.82)',ease:'none',scrollTrigger:{trigger:pg,start:'top top',end:()=>'+='+innerHeight,scrub:true,invalidateOnRefresh:true}});
     }
     const art=card.querySelector('.art');
     if(art) gsap.fromTo(art,{yPercent:0},{yPercent:-2.5,ease:'none',scrollTrigger:{trigger:pg,start:'top bottom',end:()=>'+='+innerHeight*2,scrub:true}});
