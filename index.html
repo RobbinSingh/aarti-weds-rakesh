@@ -271,9 +271,8 @@ function openGate(){ if(opened) return; opened=true;
    .set('#flap',{zIndex:0})
    .to('#letter',{yPercent:-62,duration:1.1,ease:'power3.out'},'-=.25')
    .to('#gate .gtop',{opacity:0,y:-20,duration:.6},'<')
-   .to('#letter',{scale:2.6,yPercent:-30,opacity:0,duration:1.0,ease:'power2.in'},'+=.25')
-   .to('#gate',{opacity:0,duration:.8,ease:'none'},'-=.5')
-   .add(()=>bloom(first),'-=.6');
+   .add(()=>bloom(first),'-=1.0')
+   .to('#gate',{yPercent:-100,duration:1.4,ease:'power2.inOut'},'+=.25');
 }
 $('#env').addEventListener('click',openGate);
 
