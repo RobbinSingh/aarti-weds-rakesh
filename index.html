@@ -255,7 +255,6 @@ function bloom(card,delay=0,skipArt=false){ const art=skipArt?null:card.querySel
 if(G){
   gsap.from('#gate .gtop > *',{opacity:0,y:16,filter:'blur(6px)',duration:1.2,stagger:.15,ease:soft,delay:.2});
   gsap.from('#env',{y:30,opacity:0,duration:1.4,ease:soft,delay:.5});
-  gsap.to('#seal',{scale:1.06,duration:1.4,yoyo:true,repeat:-1,ease:'sine.inOut',delay:1.8});
 }
 let opened=false;
 function openGate(){ if(opened) return; opened=true;
@@ -267,12 +266,18 @@ function openGate(){ if(opened) return; opened=true;
   gsap.set(first.querySelector('.art'),{'--b':'125%',filter:'none',scale:1});
   const grow=()=>{
     const L=$('#letter'), lr=L.getBoundingClientRect(), cr=first.getBoundingClientRect();
+    // full-size painting placed exactly where the page will be, then scaled down + cropped to sit on the rising card.
+    // Growing = one uniform scale + an opening crop (compositor-only), so the painting never re-fits or jitters.
+    const s0=lr.width/cr.width, visH=lr.height/s0, offY=.18*(cr.height-visH), botY=cr.height-offY-visH;
     const ov=document.createElement('div'); ov.id='rise';
-    ov.style.cssText=`position:fixed;z-index:260;left:${lr.left}px;top:${lr.top}px;width:${lr.width}px;height:${lr.height}px;border-radius:4px;background:#F3D5B2 url(assets/img/mandap.webp) 50% 18%/cover;box-shadow:0 14px 34px rgba(70,25,10,.35)`;
-    document.body.appendChild(ov); L.style.visibility='hidden';
-    gsap.timeline({onComplete:()=>{ $('#gate').style.display='none'; ov.remove(); done(); bloom(first,0,true); }})
-     .to(ov,{left:cr.left,top:cr.top,width:cr.width,height:cr.height,borderRadius:0,backgroundPosition:'50% 0%',duration:1.5,ease:'power3.inOut'})
-     .to(ov,{boxShadow:'0 0 0 rgba(0,0,0,0)',duration:.5},'-=.5')
+    ov.style.cssText=`position:fixed;z-index:260;left:${cr.left}px;top:${cr.top}px;width:${cr.width}px;height:${cr.height}px;background:#F3D5B2 url(assets/img/mandap.webp) center/cover;transform-origin:0 0`;
+    document.body.appendChild(ov);
+    gsap.set(ov,{x:lr.left-cr.left,y:lr.top-cr.top-s0*offY,scale:s0,clipPath:`inset(${offY}px 0px ${botY}px 0px round ${4/s0}px)`});
+    L.style.visibility='hidden';
+    gsap.timeline({onComplete:()=>{ ov.remove(); done(); }})
+     .to(ov,{x:0,y:0,scale:1,clipPath:'inset(0px 0px 0px 0px round 0px)',duration:1.6,ease:'power3.inOut'})
+     .add(()=>{ $('#gate').style.display='none'; bloom(first,0,true); })
+     .to(ov,{opacity:0,duration:.35,ease:'none'})
      .to('#env',{y:140,opacity:0,duration:.9,ease:'power2.in'},0)
      .to('#gate .gtop',{opacity:0,y:-30,duration:.6},0);
   };
