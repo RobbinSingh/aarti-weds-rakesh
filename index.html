@@ -235,7 +235,7 @@ function petals(){ const cols=['#E07A90','#D9536F','#F2A33A','#F7C26B'];
    p.style.setProperty('--dx',(Math.random()*160-80)+'px');p.style.setProperty('--r',(Math.random()*540)+'deg');document.body.appendChild(p);} }
 
 /* music */
-const audio=new Audio('assets/audio/shehnai.mp3'); audio.loop=true; audio.volume=0; const mb=$('#music');
+const audio=new Audio('assets/audio/maangal.mp3'); audio.loop=true; audio.volume=0; const mb=$('#music');
 const fade=(v,d=2)=>window.gsap?gsap.to(audio,{volume:v,duration:d}):audio.volume=v;
 mb.onclick=()=>{ if(audio.paused){audio.play();fade(.5);mb.classList.add('on');} else {fade(0,.5);setTimeout(()=>audio.pause(),520);mb.classList.remove('on');} };
 
